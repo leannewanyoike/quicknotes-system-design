@@ -112,6 +112,14 @@ function createNoteElement(note, isLocal = false) {
   item.dataset.id = note.id;
   if (isLocal) item.dataset.local = "true";
 
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.className = "btn btn--danger note__delete";
+  deleteBtn.textContent = "Delete";
+  deleteBtn.setAttribute("aria-label", `Delete note: ${note.title}`);
+  deleteBtn.addEventListener("click", () => deleteNote(item, deleteBtn));
+  item.append(deleteBtn);
+
   return item;
 }
 
@@ -201,6 +209,49 @@ async function createNote(event) {
     showStatus(`Could not create the note. ${error.message}`, "error");
   } finally {
     submitBtn.disabled = false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* DELETE: remove a note                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * JSONPlaceholder pretends to save created notes but does not store them.
+ * Its POST response always uses id 101, so a DELETE request for a created
+ * note would not target a real server resource. Mark those notes as local
+ * and remove them from the page without sending DELETE. Loaded notes use
+ * DELETE /posts/{id}; JSONPlaceholder acknowledges deletion but does not
+ * persist it, so they can reappear when the list is loaded again.
+ */
+async function deleteNote(noteEl, deleteBtn) {
+  const title = noteEl.querySelector(".note__title").textContent;
+
+  if (noteEl.dataset.local === "true") {
+    noteEl.remove();
+    if (notesList.children.length === 0) showEmptyState();
+    showStatus(
+      `Deleted “${title}”. It existed only on this page, because JSONPlaceholder does not store new notes.`,
+      "success"
+    );
+    return;
+  }
+
+  deleteBtn.disabled = true;
+  showStatus("Deleting note...", "loading");
+
+  try {
+    const { status } = await request(`${API_URL}/${noteEl.dataset.id}`, {
+      method: "DELETE",
+    });
+
+    noteEl.remove();
+    if (notesList.children.length === 0) showEmptyState();
+    showStatus(`Note deleted (status ${status}).`, "success");
+  } catch (error) {
+    showStatus(`Could not delete “${title}”. ${error.message}`, "error");
+  } finally {
+    if (noteEl.isConnected) deleteBtn.disabled = false;
   }
 }
 
