@@ -12,11 +12,17 @@
 
 const API_URL = "https://jsonplaceholder.typicode.com/posts";
 const NOTES_LIMIT = 10;
+const TITLE_MAX_LENGTH = 100;
 
 // Page elements
 const loadBtn = document.getElementById("load-btn");
 const statusEl = document.getElementById("status");
 const notesList = document.getElementById("notes-list");
+const noteForm = document.getElementById("note-form");
+const titleInput = document.getElementById("title-input");
+const bodyInput = document.getElementById("body-input");
+const submitBtn = document.getElementById("submit-btn");
+const titleCount = document.getElementById("title-count");
 
 /* ------------------------------------------------------------------ */
 /* Reusable request helper                                             */
@@ -79,8 +85,13 @@ function showEmptyState() {
   notesList.replaceChildren(item);
 }
 
-/** Builds the <li> for one note. */
-function createNoteElement(note) {
+function removeEmptyState() {
+  const emptyState = document.getElementById("empty-state");
+  if (emptyState) emptyState.remove();
+}
+
+/** Builds the <li> for one note. isLocal marks notes created in this session. */
+function createNoteElement(note, isLocal = false) {
   const item = document.createElement("li");
   item.className = "note";
 
@@ -99,6 +110,7 @@ function createNoteElement(note) {
 
   item.append(title, body);
   item.dataset.id = note.id;
+  if (isLocal) item.dataset.local = "true";
 
   return item;
 }
@@ -133,9 +145,71 @@ async function loadNotes() {
 }
 
 /* ------------------------------------------------------------------ */
+/* POST: create a note                                                 */
+/* ------------------------------------------------------------------ */
+
+/** Returns an error message, or an empty string if the title is valid. */
+function validateTitle(title) {
+  if (title === "") {
+    return "Please enter a title for your note.";
+  }
+  if (title.length > TITLE_MAX_LENGTH) {
+    return `The title is ${title.length} characters long. Please shorten it to ${TITLE_MAX_LENGTH} characters or fewer.`;
+  }
+  return "";
+}
+
+/** Keeps the "0 / 100" counter under the title field up to date. */
+function updateTitleCount() {
+  const length = titleInput.value.trim().length;
+  titleCount.textContent = `${length} / ${TITLE_MAX_LENGTH}`;
+  titleCount.classList.toggle("field__count--over", length > TITLE_MAX_LENGTH);
+}
+
+async function createNote(event) {
+  event.preventDefault();
+
+  const title = titleInput.value.trim();
+  const body = bodyInput.value.trim(); // the body is optional
+
+  const validationError = validateTitle(title);
+  if (validationError) {
+    showStatus(validationError, "error");
+    titleInput.setAttribute("aria-invalid", "true");
+    titleInput.focus();
+    return;
+  }
+  titleInput.removeAttribute("aria-invalid");
+
+  submitBtn.disabled = true;
+  showStatus("Creating note...", "loading");
+
+  try {
+    const { status, data } = await request(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ title, body, userId: 1 }),
+    });
+
+    removeEmptyState();
+    notesList.prepend(createNoteElement(data, true));
+    showStatus(`Note created (status ${status}, id ${data.id}).`, "success");
+
+    noteForm.reset();
+    updateTitleCount();
+  } catch (error) {
+    // Keep what the user typed so they can try again.
+    showStatus(`Could not create the note. ${error.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Start-up                                                            */
 /* ------------------------------------------------------------------ */
 
 loadBtn.addEventListener("click", loadNotes);
+noteForm.addEventListener("submit", createNote);
+titleInput.addEventListener("input", updateTitleCount);
 
 showEmptyState();
