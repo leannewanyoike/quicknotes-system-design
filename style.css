@@ -1,0 +1,353 @@
+/* QuickNotes – index cards on a desk */
+
+:root {
+  --desk: #e7ecef;
+  --card: #ffffff;
+  --ink: #1c2a3a;
+  --muted: #5b6b7a;
+  --line: #d3e0ec;          /* blue ruled lines on the cards */
+  --margin: #d2453a;        /* red top rule, like a real index card */
+  --accent: #24529b;
+  --accent-hover: #1a3f7a;
+  --border: #c3ced8;
+
+  --success-bg: #e3f3e8;
+  --success-text: #1b5e34;
+  --success-edge: #2e8b57;
+  --error-bg: #fbe9e7;
+  --error-text: #8e2219;
+  --error-edge: #c8382c;
+  --loading-bg: #e8eef8;
+  --loading-text: #24529b;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --rule: 1.6rem;           /* height of one ruled line on a card */
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk: #161d25;
+    --card: #222c37;
+    --ink: #e6edf3;
+    --muted: #a2b1bf;
+    --line: #2d3a48;
+    --margin: #e0675d;
+    --accent: #7fa8e8;
+    --accent-hover: #a4c2f0;
+    --border: #3a4857;
+
+    --success-bg: #173826;
+    --success-text: #9fdcb5;
+    --success-edge: #4cb87a;
+    --error-bg: #401c19;
+    --error-text: #f4b4ad;
+    --error-edge: #e0675d;
+    --loading-bg: #1d2b40;
+    --loading-text: #a4c2f0;
+
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Header ------------------------------------------------------------ */
+
+.site-header {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 1rem;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+/* Layout ------------------------------------------------------------ */
+
+.layout {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+}
+
+@media (min-width: 52rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .status {
+    grid-column: 1 / -1;
+  }
+}
+
+h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Status messages ---------------------------------------------------- */
+
+.status {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--muted);
+}
+
+.status--loading {
+  border-left-color: var(--loading-text);
+  background: var(--loading-bg);
+  color: var(--loading-text);
+}
+
+.status--success {
+  border-left-color: var(--success-edge);
+  background: var(--success-bg);
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+.status--error {
+  border-left-color: var(--error-edge);
+  background: var(--error-bg);
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+/* Form ------------------------------------------------------------- */
+
+.panel--compose {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+}
+
+.panel--compose h2 {
+  margin-bottom: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+.field__hint {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--error-edge);
+  box-shadow: 0 0 0 1px var(--error-edge);
+}
+
+.field__count {
+  align-self: flex-end;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__count--over {
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+/* Buttons ------------------------------------------------------------ */
+
+.btn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--card);
+}
+
+.btn--primary {
+  width: 100%;
+  background: var(--accent);
+  color: var(--card);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn--danger {
+  border-color: transparent;
+  color: var(--error-text);
+  font-size: 0.9rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Notes list --------------------------------------------------------- */
+
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#notes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#notes-list[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+/* Each note looks like a ruled index card. */
+.note {
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem 1rem 0.8rem;
+  border-top: 3px solid var(--margin);
+  border-radius: 2px;
+  background-color: var(--card);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--rule) - 1px),
+    var(--line) calc(var(--rule) - 1px),
+    var(--line) var(--rule)
+  );
+  background-position: 0 2.6rem;
+  box-shadow: 0 1px 2px rgba(28, 42, 58, 0.15), 0 4px 10px rgba(28, 42, 58, 0.06);
+  line-height: var(--rule);
+}
+
+.note__title {
+  margin: 0 0 0.6rem;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.note__body {
+  flex: 1;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.note__body--empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.note__delete {
+  align-self: flex-end;
+  margin-top: 0.5rem;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 2rem 1rem;
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Footer ------------------------------------------------------------- */
+
+.site-footer {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

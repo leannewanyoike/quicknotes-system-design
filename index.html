@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QuickNotes API client: load, create and delete notes using a REST API.">
+  <title>QuickNotes – API client</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="api.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1>QuickNotes</h1>
+    <p class="tagline">Write it down before you forget it.</p>
+  </header>
+
+  <main class="layout">
+    <p id="status" class="status status--info" role="status" aria-live="polite">
+      Click “Load notes” to fetch notes from the server.
+    </p>
+
+    <section class="panel panel--compose" aria-labelledby="compose-heading">
+      <h2 id="compose-heading">New note</h2>
+
+      <form id="note-form" novalidate>
+        <div class="field">
+          <label for="title-input">Title <span class="field__hint">(required, up to 100 characters)</span></label>
+          <input id="title-input" name="title" type="text" autocomplete="off" aria-describedby="title-count">
+          <span id="title-count" class="field__count">0 / 100</span>
+        </div>
+
+        <div class="field">
+          <label for="body-input">Details <span class="field__hint">(optional)</span></label>
+          <textarea id="body-input" name="body" rows="5"></textarea>
+        </div>
+
+        <button id="submit-btn" type="submit" class="btn btn--primary">Create note</button>
+      </form>
+    </section>
+
+    <section class="panel panel--notes" aria-labelledby="notes-heading">
+      <div class="notes-header">
+        <h2 id="notes-heading">Your notes</h2>
+        <button id="load-btn" type="button" class="btn">Load notes</button>
+      </div>
+
+      <ul id="notes-list"></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Practice data from JSONPlaceholder. Changes are not really saved on the server.</p>
+  </footer>
+</body>
+</html>
